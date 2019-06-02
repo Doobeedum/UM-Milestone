@@ -9,15 +9,15 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import pandas as pd
 
-# split data in 80%/10%/10% train/validation/test sets
+## split data in 80%/10%/10% train/validation/test sets
 valid_set_size_percentage = 10 
 test_set_size_percentage = 10 
 
-#display parent directory and working directory
+##display parent directory and working directory
 print(os.path.dirname(os.getcwd())+':', os.listdir(os.path.dirname(os.getcwd())));
 print(os.getcwd()+':', os.listdir(os.getcwd()));
 
-# import all stock prices 
+## import all stock prices 
 df = pd.read_csv('5133 Petra Energy Bhd (PTRE).csv', index_col = 1)
 #stock/done/
 #df.drop(['Class'],1,inplace=True)
@@ -27,13 +27,11 @@ df = pd.read_csv('5133 Petra Energy Bhd (PTRE).csv', index_col = 1)
 df.drop(['Change'],1,inplace=True)
 #df.drop(['neutral'],1,inplace=True)
 df.drop(['Unnamed: 0'],1,inplace=True)
+df_stock.drop(['Volume'],1,inplace=True)
 
-#df_stock.drop(['symbol'],1,inplace=True)
 df.info()
 df.head()
-# number of different stocks
-#print('\nnumber of different stocks: ', len(list(set(df.symbol))))
-#print(list(set(df.symbol))[:10])
+## number of different stocks
 
 df.describe()
 
@@ -58,7 +56,7 @@ plt.xlabel('time [days]')
 plt.ylabel('volume')
 plt.legend(loc='best');
 
-# function for min-max normalization of stock
+## function for min-max normalization of stock
 def normalize_data(df):
     min_max_scaler = sklearn.preprocessing.MinMaxScaler()
     df['Open'] = min_max_scaler.fit_transform(df.Open.values.reshape(-1,1))
@@ -67,7 +65,7 @@ def normalize_data(df):
     df['Close'] = min_max_scaler.fit_transform(df['Close'].values.reshape(-1,1))
     return df
 
-# function to create train, validation, test data given stock data and sequence length
+## function to create train, validation, test data given stock data and sequence length
 def load_data(stock, seq_len):
     data_raw = stock.as_matrix() # convert to numpy array
     data = []
@@ -92,18 +90,16 @@ def load_data(stock, seq_len):
     
     return [x_train, y_train, x_valid, y_valid, x_test, y_test]
 
-# choose one stock
 df_stock = df.copy()
-df_stock.drop(['Volume'],1,inplace=True)
 
 cols = list(df_stock.columns.values)
 print('df_stock.columns.values = ', cols)
 
-# normalize stock
+## normalize stock
 df_stock_norm = df_stock.copy()
 df_stock_norm = normalize_data(df_stock_norm)
 
-# create train, test data
+## create train, test data
 seq_len = 20 # choose sequence length
 x_train, y_train, x_valid, y_valid, x_test, y_test = load_data(df_stock_norm, seq_len)
 print('x_train.shape = ',x_train.shape)
@@ -145,7 +141,7 @@ def get_next_batch(batch_size):
     end = index_in_epoch
     return x_train[perm_array[start:end]], y_train[perm_array[start:end]]
 
-# parameters
+## parameters
 n_steps = seq_len-1 
 n_inputs = 4 
 n_neurons = 200 
@@ -162,20 +158,20 @@ tf.reset_default_graph()
 X = tf.placeholder(tf.float32, [None, n_steps, n_inputs])
 y = tf.placeholder(tf.float32, [None, n_outputs])
 
-# use Basic RNN Cell
+## use Basic RNN Cell
 layers = [tf.contrib.rnn.BasicRNNCell(num_units=n_neurons, activation=tf.nn.elu)
           for layer in range(n_layers)]
 
-# use Basic LSTM Cell 
+## use Basic LSTM Cell 
 #layers = [tf.contrib.rnn.BasicLSTMCell(num_units=n_neurons, activation=tf.nn.elu)
 #          for layer in range(n_layers)]
 
-# use LSTM Cell with peephole connections
+## use LSTM Cell with peephole connections
 #layers = [tf.contrib.rnn.LSTMCell(num_units=n_neurons, 
 #                                  activation=tf.nn.leaky_relu, use_peepholes = True)
 #          for layer in range(n_layers)]
 
-# use GRU cell
+## use GRU cell
 #layers = [tf.contrib.rnn.GRUCell(num_units=n_neurons, activation=tf.nn.leaky_relu)
 #          for layer in range(n_layers)]
                                                                      
@@ -191,7 +187,7 @@ loss = tf.reduce_mean(tf.square(outputs - y)) # loss function = mean squared err
 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate) 
 training_op = optimizer.minimize(loss)
                                               
-# run graph
+## run graph
 with tf.Session() as sess: 
     sess.run(tf.global_variables_initializer())
     for iteration in range(int(n_epochs*train_set_size/batch_size)):
