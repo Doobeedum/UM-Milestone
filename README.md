@@ -114,7 +114,6 @@ plt.plot(df_stock_norm.Open.values, color='red', label='Open')
 plt.plot(df_stock_norm.Close.values, color='green', label='Low')
 plt.plot(df_stock_norm.Low.values, color='blue', label='Low')
 plt.plot(df_stock_norm.High.values, color='black', label='High')
-#plt.plot(df_stock_norm.volume.values, color='gray', label='volume')
 plt.title('stock')
 plt.xlabel('time [days]')
 plt.ylabel('normalized price/volume')
@@ -161,19 +160,6 @@ y = tf.placeholder(tf.float32, [None, n_outputs])
 ## use Basic RNN Cell
 layers = [tf.contrib.rnn.BasicRNNCell(num_units=n_neurons, activation=tf.nn.elu)
           for layer in range(n_layers)]
-
-## use Basic LSTM Cell 
-#layers = [tf.contrib.rnn.BasicLSTMCell(num_units=n_neurons, activation=tf.nn.elu)
-#          for layer in range(n_layers)]
-
-## use LSTM Cell with peephole connections
-#layers = [tf.contrib.rnn.LSTMCell(num_units=n_neurons, 
-#                                  activation=tf.nn.leaky_relu, use_peepholes = True)
-#          for layer in range(n_layers)]
-
-## use GRU cell
-#layers = [tf.contrib.rnn.GRUCell(num_units=n_neurons, activation=tf.nn.leaky_relu)
-#          for layer in range(n_layers)]
                                                                      
 multi_layer_cell = tf.contrib.rnn.MultiRNNCell(layers)
 rnn_outputs, states = tf.nn.dynamic_rnn(multi_layer_cell, X, dtype=tf.float32)
@@ -231,9 +217,6 @@ plt.ylabel('normalized price')
 plt.legend(loc='best');
 
 plt.subplot(1,2,2);
-
-#plt.plot(np.arange(y_train.shape[0], y_train.shape[0]+y_test.shape[0]),
-#         y_test[:,ft], color='black', label='test target')
 
 plt.plot(np.arange(y_train_pred.shape[0], y_train_pred.shape[0]+y_test_pred.shape[0]),
          y_test_pred[:,ft], color='green', label='test prediction')
